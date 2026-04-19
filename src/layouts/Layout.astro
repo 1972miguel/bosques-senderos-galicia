@@ -35,38 +35,38 @@ const {
     <main class="flex-1 pb-24"> <slot />
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-stone-900/95 backdrop-blur-md border-t border-stone-800 z-50">
-      <div class="flex justify-around items-center h-16 max-w-2xl mx-auto px-4">
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex justify-center"> 
+  <div class="w-full max-w-2xl bg-stone-900/95 backdrop-blur-md border-t border-x border-stone-800 h-16 px-4 flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
 
-        <a href="/" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'inicio' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'inicio' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H15v-5h-6v5H4a1 1 0 01-1-1V9.5z"/>
-          </svg>
-          <span class="text-[10px] font-medium">Inicio</span>
-        </a>
+    <a href="/" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'inicio' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'inicio' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H15v-5h-6v5H4a1 1 0 01-1-1V9.5z"/>
+      </svg>
+      <span class="text-[10px] font-medium">Inicio</span>
+    </a>
 
-        <a href="/rutas" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'rutas' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'rutas' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-          </svg>
-          <span class="text-[10px] font-medium">Rutas</span>
-        </a>
+    <a href="/rutas" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'rutas' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'rutas' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+      </svg>
+      <span class="text-[10px] font-medium">Rutas</span>
+    </a>
 
-        <a href="/ecosistemas" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'ecosistemas' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'ecosistemas' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-          </svg>
-          <span class="text-[10px] font-medium">Ecosistemas</span>
-        </a>
+    <a href="/ecosistemas" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'ecosistemas' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'ecosistemas' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+      </svg>
+      <span class="text-[10px] font-medium">Ecosistemas</span>
+    </a>
 
-        <a href="/especies" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'especies' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'especies' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.746 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-          </svg>
-          <span class="text-[10px] font-medium">Especies</span>
-        </a>
+    <a href="/especies" class={`flex flex-col items-center gap-1 transition-colors duration-200 min-w-[60px] ${activeTab === 'especies' ? 'text-green-500' : 'text-stone-500 hover:text-stone-300'}`}>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill={activeTab === 'especies' ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.746 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      <span class="text-[10px] font-medium">Especies</span>
+    </a>
 
-      </div>
-    </nav>
+  </div>
+</nav>
   </body>
 </html>

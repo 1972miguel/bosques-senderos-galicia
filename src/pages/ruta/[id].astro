@@ -54,15 +54,15 @@ const { Content } = await render(ruta)
   <div class="grid grid-cols-3 gap-px bg-stone-800 border-y border-stone-800">
     <div class="bg-stone-950 px-4 py-3 text-center">
       <div class="text-lg font-medium text-stone-100">{ruta.data.distancia} km</div>
-      <div class="text-xs text-stone-500 mt-0.5">Distancia</div>
+      <div class="text-xs text-stone-400 mt-0.5">Distancia</div>
     </div>
     <div class="bg-stone-950 px-4 py-3 text-center">
       <div class="text-lg font-medium text-stone-100">↑ {ruta.data.desnivel} m</div>
-      <div class="text-xs text-stone-500 mt-0.5">Desnivel</div>
+      <div class="text-xs text-stone-400 mt-0.5">Desnivel</div>
     </div>
     <div class="bg-stone-950 px-4 py-3 text-center">
       <div class="text-lg font-medium text-stone-100">{ruta.data.duracion}</div>
-      <div class="text-xs text-stone-500 mt-0.5">Duración</div>
+      <div class="text-xs text-stone-400 mt-0.5">Duración</div>
     </div>
   </div>
 
@@ -72,9 +72,9 @@ const { Content } = await render(ruta)
        class="mx-4 mt-4 flex items-center gap-3 bg-stone-900 border border-stone-800 rounded-xl p-3 hover:border-green-800 transition-colors">
       <div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div>
       <div>
-        <div class="text-xs text-stone-500">Ecosistema</div>
+        <div class="text-xs text-stone-400">Ecosistema</div>
         <div class="text-sm text-stone-200 font-medium">{ecosistema.data.nome}</div>
-        <div class="text-xs text-stone-500">{ecosistema.data.zona}</div>
+        <div class="text-xs text-stone-400">{ecosistema.data.zona}</div>
       </div>
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
