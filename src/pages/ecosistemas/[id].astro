@@ -1,0 +1,74 @@
+---
+import { getCollection, getEntry, render } from 'astro:content'
+import Layout from '../../layouts/Layout.astro'
+
+export async function getStaticPaths() {
+  const ecosistemas = await getCollection('ecosistemas')
+  return ecosistemas.map(eco => ({
+    params: { id: eco.id },
+    props: { eco }
+  }))
+}
+
+const { eco } = Astro.props
+const { Content } = await render(eco)
+
+const todasRutas = await getCollection('rutas', ({ data }) => data.publicada)
+const rutasEco = todasRutas.filter(r => r.data.ecosistema.id === eco.id)
+---
+
+<Layout titulo={eco.data.nome}>
+
+  <!-- Cabecera -->
+  <div class="px-4 pt-6 pb-5" style={`background: ${eco.data.cor}`}>
+    <a href="/ecosistemas" class="text-green-400 text-sm mb-3 flex items-center gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Ecosistemas
+    </a>
+    <h1 class="text-2xl font-medium text-stone-100 mb-1">{eco.data.nome}</h1>
+    <p class="text-green-300 text-sm">{eco.data.subtitulo}</p>
+    <p class="text-green-400 text-xs mt-1">{eco.data.zona}</p>
+  </div>
+
+  <!-- Resumo -->
+  <div class="mx-4 mt-4 bg-stone-900 border border-stone-800 rounded-xl p-4">
+    <p class="text-stone-300 text-sm leading-relaxed">{eco.data.resumo}</p>
+  </div>
+
+  <!-- Rutas que pasan por este ecosistema -->
+  {rutasEco.length > 0 && (
+    <div class="px-4 mt-6">
+      <h2 class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-3">
+        Rutas neste ecosistema
+      </h2>
+      <div class="flex flex-col gap-2">
+        {rutasEco.map(ruta => (
+          <a href={`/ruta/${ruta.id}`}
+             class="bg-stone-900 border border-stone-800 rounded-xl p-3 flex justify-between items-center hover:border-green-800 transition-colors">
+            <div>
+              <div class="text-stone-200 text-sm font-medium">{ruta.data.titulo}</div>
+              <div class="text-stone-500 text-xs mt-0.5">
+                {ruta.data.distancia} km · {ruta.data.duracion}
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- Contenido MDX -->
+  <div class="px-4 py-6 prose prose-invert prose-sm max-w-none
+              prose-headings:text-stone-200 prose-headings:font-medium
+              prose-p:text-stone-400 prose-p:leading-relaxed
+              prose-strong:text-stone-300
+              prose-em:text-stone-400">
+    <Content />
+  </div>
+
+</Layout>

@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content'
+import Layout from '../../layouts/Layout.astro'
+
+const ecosistemas = await getCollection('ecosistemas')
+console.log('IDs:', ecosistemas.map(e => e.id))
+---
+
+<Layout titulo="Ecosistemas">
+  <div class="px-4 pt-6">
+    <h1 class="text-xl font-medium text-stone-100 mb-1">Ecosistemas</h1>
+    <p class="text-stone-500 text-sm mb-6">Galicia · {ecosistemas.length} ecosistemas</p>
+
+    <div class="flex flex-col gap-3">
+      {ecosistemas.map(eco => (
+        <a href={`/ecosistemas/${eco.id}`}
+           class="border border-stone-800 rounded-xl p-4 hover:border-green-800 transition-colors"
+           style={`background: ${eco.data.cor}22`}>
+          <h2 class="text-stone-100 font-medium mb-1">{eco.data.nome}</h2>
+          <p class="text-stone-500 text-xs mb-2">{eco.data.zona}</p>
+          <p class="text-stone-400 text-sm leading-relaxed">{eco.data.resumo}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

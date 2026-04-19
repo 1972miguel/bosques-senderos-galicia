@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content'
 import Layout from '../../layouts/Layout.astro'
 
 const rutas = await getCollection('rutas', ({ data }) => data.publicada)
+console.log(rutas.map(r => r.id))
 ---
 
 <Layout titulo="Rutas">
@@ -23,7 +24,7 @@ const rutas = await getCollection('rutas', ({ data }) => data.publicada)
           <p class="text-stone-500 text-xs mb-3">{ruta.data.provincia}</p>
           <div class="flex gap-4">
             <span class="text-xs text-stone-400">{ruta.data.distancia} km</span>
-            <span class="text-xs text-stone-400">↑{ruta.data.desnivel} m</span>
+            <span class="text-xs text-stone-400">↑ {ruta.data.desnivel} m</span>
             <span class="text-xs text-stone-400">{ruta.data.duracion}</span>
           </div>
         </a>
