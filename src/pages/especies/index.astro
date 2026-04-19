@@ -50,15 +50,15 @@ const outros = especies.filter(e => e.data.tipo !== 'flora' && e.data.tipo !== '
 
     {fauna.length > 0 && (
       <div class="mb-6">
-        <h2 class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-3">Fauna</h2>
+        <h2 class="text-xs font-medium text-stone-400 uppercase tracking-wide mb-3">Fauna</h2>
         <div class="flex flex-col gap-2">
           {fauna.map(e => (
             <a href={`/especies/${e.id}`}
                class="bg-stone-900 border border-stone-800 rounded-xl p-4 hover:border-green-800 transition-colors flex justify-between items-center">
               <div>
                 <div class="text-stone-100 font-medium">{e.data.nomeComun}</div>
-                <div class="text-stone-500 text-xs italic mt-0.5">{e.data.nomeCientifico}</div>
-                <div class="text-stone-600 text-xs mt-1">{e.data.familia}</div>
+                <div class="text-stone-300 text-xs italic mt-0.5">{e.data.nomeCientifico}</div>
+                <div class="text-stone-400 text-xs mt-1">{e.data.familia}</div>
               </div>
               <div class="flex flex-col items-end gap-2">
                 {e.data.conservacion && (
