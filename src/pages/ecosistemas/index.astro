@@ -6,7 +6,7 @@ const ecosistemas = await getCollection('ecosistemas')
 console.log('IDs:', ecosistemas.map(e => e.id))
 ---
 
-<Layout titulo="Ecosistemas">
+<Layout titulo="Ecosistemas" activeTab="ecosistemas">
   <div class="px-4 pt-6">
     <h1 class="text-xl font-medium text-stone-100 mb-1">Ecosistemas</h1>
     <p class="text-stone-500 text-sm mb-6">Galicia · {ecosistemas.length} ecosistemas</p>

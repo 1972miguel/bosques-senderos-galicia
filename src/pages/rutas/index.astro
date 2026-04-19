@@ -6,7 +6,7 @@ const rutas = await getCollection('rutas', ({ data }) => data.publicada)
 console.log(rutas.map(r => r.id))
 ---
 
-<Layout titulo="Rutas">
+<Layout titulo="Rutas" activeTab="rutas">
   <div class="px-4 pt-6">
     <h1 class="text-xl font-medium text-stone-100 mb-1">Rutas</h1>
     <p class="text-stone-500 text-sm mb-6">Galicia · {rutas.length} sendeiros</p>
