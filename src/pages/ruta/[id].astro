@@ -1,0 +1,120 @@
+---
+import { getCollection, getEntry, render } from 'astro:content'
+import Layout from '../../layouts/Layout.astro'
+
+export async function getStaticPaths() {
+  const rutas = await getCollection('rutas')
+  return rutas.map(ruta => ({
+    params: { id: ruta.id },
+    props: { ruta }
+  }))
+}
+
+const { ruta } = Astro.props
+const ecosistema = await getEntry(ruta.data.ecosistema)
+const { Content } = await render(ruta)
+---
+
+<Layout titulo={ruta.data.titulo}>
+
+  <!-- Cabecera con imagen o color -->
+  <div class="bg-stone-900 px-4 pt-6 pb-4">
+    <a href="/rutas" class="text-green-500 text-sm mb-3 flex items-center gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Todas as rutas
+    </a>
+    <h1 class="text-2xl font-medium text-stone-100">{ruta.data.titulo}</h1>
+    {ruta.data.subtitulo && (
+      <p class="text-stone-400 text-sm mt-1">{ruta.data.subtitulo}</p>
+    )}
+    <div class="flex gap-2 mt-3 flex-wrap">
+      <span class="bg-stone-800 text-stone-300 text-xs px-3 py-1 rounded-full">
+        {ruta.data.tipo}
+      </span>
+      <span class="bg-stone-800 text-stone-300 text-xs px-3 py-1 rounded-full">
+        {ruta.data.dificultade}
+      </span>
+      <span class="bg-stone-800 text-stone-300 text-xs px-3 py-1 rounded-full">
+        {ruta.data.provincia}
+      </span>
+    </div>
+  </div>
+
+  <!-- Mapa -->
+ <div 
+  id="mapa" 
+  class="w-full h-64 bg-stone-800 relative z-0"
+  data-lat={ruta.data.coordenadasInicio.lat}
+  data-lng={ruta.data.coordenadasInicio.lng}
+></div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-px bg-stone-800 border-y border-stone-800">
+    <div class="bg-stone-950 px-4 py-3 text-center">
+      <div class="text-lg font-medium text-stone-100">{ruta.data.distancia} km</div>
+      <div class="text-xs text-stone-500 mt-0.5">Distancia</div>
+    </div>
+    <div class="bg-stone-950 px-4 py-3 text-center">
+      <div class="text-lg font-medium text-stone-100">{ruta.data.desnivel} m</div>
+      <div class="text-xs text-stone-500 mt-0.5">Desnivel</div>
+    </div>
+    <div class="bg-stone-950 px-4 py-3 text-center">
+      <div class="text-lg font-medium text-stone-100">{ruta.data.duracion}</div>
+      <div class="text-xs text-stone-500 mt-0.5">Duración</div>
+    </div>
+  </div>
+
+  <!-- Ecosistema vinculado -->
+  {ecosistema && (
+    <a href={`/ecosistemas/${ecosistema.id}`}
+       class="mx-4 mt-4 flex items-center gap-3 bg-stone-900 border border-stone-800 rounded-xl p-3 hover:border-green-800 transition-colors">
+      <div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div>
+      <div>
+        <div class="text-xs text-stone-500">Ecosistema</div>
+        <div class="text-sm text-stone-200 font-medium">{ecosistema.data.nome}</div>
+        <div class="text-xs text-stone-500">{ecosistema.data.zona}</div>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
+  )}
+
+  <!-- Contenido MDX -->
+  <div class="px-4 py-6 prose prose-invert prose-sm max-w-none
+              prose-headings:text-stone-200 prose-headings:font-medium
+              prose-p:text-stone-400 prose-p:leading-relaxed
+              prose-strong:text-stone-300
+              prose-em:text-stone-400">
+    <Content />
+  </div>
+
+</Layout>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script>
+  import L from 'leaflet'
+
+  const lat = Number(document.getElementById('mapa')?.dataset.lat)
+  const lng = Number(document.getElementById('mapa')?.dataset.lng)
+
+  const mapa = L.map('mapa', { zoomControl: false }).setView([lat || 43.3897, lng || -7.9892], 14)
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(mapa)
+
+  L.control.zoom({ position: 'bottomright' }).addTo(mapa)
+
+  const icono = L.divIcon({
+    className: '',
+    html: '<div style="width:12px;height:12px;background:#4caf50;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 3px rgba(76,175,80,0.3)"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  })
+
+  L.marker([lat || 43.3897, lng || -7.9892], { icon: icono }).addTo(mapa)
+</script>

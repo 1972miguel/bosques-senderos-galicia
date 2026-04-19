@@ -1,17 +1,14 @@
 ---
-
+import Layout from '../layouts/Layout.astro'
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout titulo="Inicio">
+  <div class="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center gap-4">
+    <h1 class="text-3xl font-medium text-green-400">
+      Sendeiros e Bosques de Galicia
+    </h1>
+    <p class="text-stone-400 text-sm max-w-xs">
+      Rutas con ficha ecolóxica do ecosistema galego
+    </p>
+  </div>
+</Layout>

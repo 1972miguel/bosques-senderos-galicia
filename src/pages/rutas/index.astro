@@ -1,0 +1,33 @@
+---
+import { getCollection } from 'astro:content'
+import Layout from '../../layouts/Layout.astro'
+
+const rutas = await getCollection('rutas', ({ data }) => data.publicada)
+---
+
+<Layout titulo="Rutas">
+  <div class="px-4 pt-6">
+    <h1 class="text-xl font-medium text-stone-100 mb-1">Rutas</h1>
+    <p class="text-stone-500 text-sm mb-6">Galicia · {rutas.length} sendeiros</p>
+
+    <div class="flex flex-col gap-3">
+      {rutas.map(ruta => (
+        <a href={`/ruta/${ruta.id}`}
+           class="bg-stone-900 border border-stone-800 rounded-xl p-4 hover:border-green-800 transition-colors">
+          <div class="flex justify-between items-start mb-2">
+            <h2 class="text-stone-100 font-medium">{ruta.data.titulo}</h2>
+            <span class="text-xs text-stone-500 bg-stone-800 px-2 py-0.5 rounded-full shrink-0 ml-2">
+              {ruta.data.dificultade}
+            </span>
+          </div>
+          <p class="text-stone-500 text-xs mb-3">{ruta.data.provincia}</p>
+          <div class="flex gap-4">
+            <span class="text-xs text-stone-400">{ruta.data.distancia} km</span>
+            <span class="text-xs text-stone-400">↑{ruta.data.desnivel} m</span>
+            <span class="text-xs text-stone-400">{ruta.data.duracion}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>
