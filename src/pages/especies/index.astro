@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content'
+import Layout from '../../layouts/Layout.astro'
+
+const especies = await getCollection('especies')
+
+const flora = especies.filter(e => e.data.tipo === 'flora')
+const fauna = especies.filter(e => e.data.tipo === 'fauna')
+const outros = especies.filter(e => e.data.tipo !== 'flora' && e.data.tipo !== 'fauna')
+---
+
+<Layout titulo="Especies">
+  <div class="px-4 pt-6">
+    <h1 class="text-xl font-medium text-stone-100 mb-1">Especies</h1>
+    <p class="text-stone-400 text-sm mb-6">Galicia · {especies.length} especies</p>
+
+    {flora.length > 0 && (
+      <div class="mb-6">
+        <h2 class="text-xs font-medium text-stone-400 uppercase tracking-wide mb-3">Flora</h2>
+        <div class="flex flex-col gap-2">
+          {flora.map(e => (
+            <a href={`/especies/${e.id}`}
+               class="bg-stone-900 border border-stone-800 rounded-xl p-4 hover:border-green-800 transition-colors flex justify-between items-center">
+              <div>
+                <div class="text-stone-100 font-medium">{e.data.nomeComun}</div>
+                <div class="text-stone-300 text-xs italic mt-0.5">{e.data.nomeCientifico}</div>
+                <div class="text-stone-400 text-xs mt-1">{e.data.familia}</div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                {e.data.conservacion && (
+                  <span class={`text-xs px-2 py-0.5 rounded-full font-medium
+                    ${e.data.conservacion === 'LC' ? 'bg-green-950 text-green-400' : ''}
+                    ${e.data.conservacion === 'NT' ? 'bg-yellow-950 text-yellow-400' : ''}
+                    ${e.data.conservacion === 'VU' ? 'bg-orange-950 text-orange-400' : ''}
+                    ${e.data.conservacion === 'EN' ? 'bg-red-950 text-red-400' : ''}
+                    ${e.data.conservacion === 'CR' ? 'bg-red-950 text-red-300' : ''}
+                  `}>
+                    {e.data.conservacion}
+                  </span>
+                )}
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {fauna.length > 0 && (
+      <div class="mb-6">
+        <h2 class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-3">Fauna</h2>
+        <div class="flex flex-col gap-2">
+          {fauna.map(e => (
+            <a href={`/especies/${e.id}`}
+               class="bg-stone-900 border border-stone-800 rounded-xl p-4 hover:border-green-800 transition-colors flex justify-between items-center">
+              <div>
+                <div class="text-stone-100 font-medium">{e.data.nomeComun}</div>
+                <div class="text-stone-500 text-xs italic mt-0.5">{e.data.nomeCientifico}</div>
+                <div class="text-stone-600 text-xs mt-1">{e.data.familia}</div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                {e.data.conservacion && (
+                  <span class={`text-xs px-2 py-0.5 rounded-full font-medium
+                    ${e.data.conservacion === 'LC' ? 'bg-green-950 text-green-400' : ''}
+                    ${e.data.conservacion === 'NT' ? 'bg-yellow-950 text-yellow-400' : ''}
+                    ${e.data.conservacion === 'VU' ? 'bg-orange-950 text-orange-400' : ''}
+                    ${e.data.conservacion === 'EN' ? 'bg-red-950 text-red-400' : ''}
+                    ${e.data.conservacion === 'CR' ? 'bg-red-950 text-red-300' : ''}
+                  `}>
+                    {e.data.conservacion}
+                  </span>
+                )}
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</Layout>

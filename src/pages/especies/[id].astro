@@ -1,0 +1,97 @@
+---
+import { getCollection, getEntry, render } from 'astro:content'
+import Layout from '../../layouts/Layout.astro'
+
+export async function getStaticPaths() {
+  const especies = await getCollection('especies')
+  return especies.map(especie => ({
+    params: { id: especie.id },
+    props: { especie }
+  }))
+}
+
+const { especie } = Astro.props
+const { Content } = await render(especie)
+
+const conservacionLabels: Record<string, string> = {
+  LC: 'Preocupación menor',
+  NT: 'Case ameazada',
+  VU: 'Vulnerable',
+  EN: 'En perigo',
+  CR: 'En perigo crítico'
+}
+
+const conservacionClases: Record<string, string> = {
+  LC: 'bg-green-950 text-green-400 border-green-900',
+  NT: 'bg-yellow-950 text-yellow-400 border-yellow-900',
+  VU: 'bg-orange-950 text-orange-400 border-orange-900',
+  EN: 'bg-red-950 text-red-400 border-red-900',
+  CR: 'bg-red-950 text-red-300 border-red-900'
+}
+---
+
+<Layout titulo={especie.data.nomeComun}>
+
+  <!-- Cabecera -->
+  <div class="bg-stone-900 px-4 pt-6 pb-5">
+    <a href="/especies" class="text-green-500 text-sm mb-3 flex items-center gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Especies
+    </a>
+    <h1 class="text-2xl font-medium text-stone-100">{especie.data.nomeComun}</h1>
+    <p class="text-stone-400 text-sm italic mt-1">{especie.data.nomeCientifico}</p>
+    <p class="text-stone-400 text-xs mt-1">{especie.data.familia}</p>
+
+    <div class="flex gap-2 mt-3 flex-wrap items-center">
+      <span class={`text-xs px-3 py-1 rounded-full border
+        ${especie.data.tipo === 'flora' ? 'bg-green-950 text-green-400 border-green-900' : ''}
+        ${especie.data.tipo === 'fauna' ? 'bg-blue-950 text-blue-400 border-blue-900' : ''}
+        ${especie.data.tipo === 'fungo' ? 'bg-orange-950 text-orange-400 border-orange-900' : ''}
+        ${especie.data.tipo === 'liquen' ? 'bg-stone-800 text-stone-400 border-stone-700' : ''}
+      `}>
+        {especie.data.tipo}
+      </span>
+      {especie.data.conservacion && (
+        <span class={`text-xs px-3 py-1 rounded-full border ${conservacionClases[especie.data.conservacion]}`}>
+          {especie.data.conservacion} · {conservacionLabels[especie.data.conservacion]}
+        </span>
+      )}
+    </div>
+  </div>
+
+  <!-- Ecosistemas vinculados -->
+  {especie.data.ecosistemas && especie.data.ecosistemas.length > 0 && (
+    <div class="px-4 mt-4">
+      <h2 class="text-xs font-medium text-stone-500 uppercase tracking-wide mb-2">Ecosistemas</h2>
+      <div class="flex flex-col gap-2">
+        {especie.data.ecosistemas.map(async (ref) => {
+          const eco = await getEntry(ref)
+          return (
+            <a href={`/ecosistemas/${eco.id}`}
+               class="bg-stone-900 border border-stone-800 rounded-xl p-3 flex justify-between items-center hover:border-green-800 transition-colors">
+              <div>
+                <div class="text-stone-200 text-sm font-medium">{eco.data.nome}</div>
+                <div class="text-stone-400 text-xs">{eco.data.zona}</div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+          )
+        })}
+      </div>
+    </div>
+  )}
+
+  <!-- Contenido MDX -->
+  <div class="px-4 py-6 prose prose-invert prose-sm max-w-none
+              prose-headings:text-stone-200 prose-headings:font-medium
+              prose-p:text-stone-400 prose-p:leading-relaxed
+              prose-strong:text-stone-300
+              prose-em:text-stone-400">
+    <Content />
+  </div>
+
+</Layout>
