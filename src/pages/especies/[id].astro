@@ -1,9 +1,14 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content'
 import Layout from '../../layouts/Layout.astro'
+import Card from '../../components/common/Card.astro'
+import { getSpecieIds } from '../../utils/collections'
+import { CONSERVATION_LABELS, CONSERVATION_CLASSES, SPECIES_TYPE_CLASSES } from '../../types'
 
 export async function getStaticPaths() {
+  const specieIds = await getSpecieIds()
   const especies = await getCollection('especies')
+  
   return especies.map(especie => ({
     params: { id: especie.id },
     props: { especie }
@@ -13,24 +18,16 @@ export async function getStaticPaths() {
 const { especie } = Astro.props
 const { Content } = await render(especie)
 
-const conservacionLabels: Record<string, string> = {
-  LC: 'Preocupación menor',
-  NT: 'Case ameazada',
-  VU: 'Vulnerable',
-  EN: 'En perigo',
-  CR: 'En perigo crítico'
-}
-
-const conservacionClases: Record<string, string> = {
-  LC: 'bg-green-950 text-green-400 border-green-900',
-  NT: 'bg-yellow-950 text-yellow-400 border-yellow-900',
-  VU: 'bg-orange-950 text-orange-400 border-orange-900',
-  EN: 'bg-red-950 text-red-400 border-red-900',
-  CR: 'bg-red-950 text-red-300 border-red-900'
+// ✅ FIX: Cargar ecosistemas en paralelo ANTES del template
+let ecosistemasData: Array<{ id: string; data: any }> = []
+if (especie.data.ecosistemas && especie.data.ecosistemas.length > 0) {
+  ecosistemasData = await Promise.all(
+    especie.data.ecosistemas.map(ref => getEntry(ref))
+  )
 }
 ---
 
-<Layout titulo={especie.data.nomeComun}>
+<Layout titulo={especie.data.nomeComun} activeTab="especies">
 
   <!-- Cabecera -->
   <div class="bg-stone-900 px-4 pt-6 pb-5">
@@ -46,41 +43,29 @@ const conservacionClases: Record<string, string> = {
 
     <div class="flex gap-2 mt-3 flex-wrap items-center">
       <span class={`text-xs px-3 py-1 rounded-full border
-        ${especie.data.tipo === 'flora' ? 'bg-green-950 text-green-400 border-green-900' : ''}
-        ${especie.data.tipo === 'fauna' ? 'bg-blue-950 text-blue-400 border-blue-900' : ''}
-        ${especie.data.tipo === 'fungo' ? 'bg-orange-950 text-orange-400 border-orange-900' : ''}
-        ${especie.data.tipo === 'liquen' ? 'bg-stone-800 text-stone-400 border-stone-700' : ''}
-      `}>
+        ${SPECIES_TYPE_CLASSES[especie.data.tipo]}`}>
         {especie.data.tipo}
       </span>
       {especie.data.conservacion && (
-        <span class={`text-xs px-3 py-1 rounded-full border ${conservacionClases[especie.data.conservacion]}`}>
-          {especie.data.conservacion} · {conservacionLabels[especie.data.conservacion]}
+        <span class={`text-xs px-3 py-1 rounded-full border ${CONSERVATION_CLASSES[especie.data.conservacion]}`}>
+          {especie.data.conservacion} · {CONSERVATION_LABELS[especie.data.conservacion]}
         </span>
       )}
     </div>
   </div>
 
   <!-- Ecosistemas vinculados -->
-  {especie.data.ecosistemas && especie.data.ecosistemas.length > 0 && (
+  {ecosistemasData && ecosistemasData.length > 0 && (
     <div class="px-4 mt-4">
       <h2 class="text-xs font-medium text-stone-400 uppercase tracking-wide mb-2">Ecosistemas</h2>
       <div class="flex flex-col gap-2">
-        {especie.data.ecosistemas.map(async (ref) => {
-          const eco = await getEntry(ref)
-          return (
-            <a href={`/ecosistemas/${eco.id}`}
-               class="bg-stone-900 border border-stone-800 rounded-xl p-3 flex justify-between items-center hover:border-green-800 transition-colors">
-              <div>
-                <div class="text-stone-200 text-sm font-medium">{eco.data.nome}</div>
-                <div class="text-stone-400 text-xs">{eco.data.zona}</div>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </a>
-          )
-        })}
+        {ecosistemasData.map(eco => (
+          <Card
+            href={`/ecosistemas/${eco.id}`}
+            title={eco.data.nome}
+            subtitle={eco.data.zona}
+          />
+        ))}
       </div>
     </div>
   )}

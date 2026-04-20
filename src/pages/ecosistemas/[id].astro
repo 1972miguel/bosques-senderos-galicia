@@ -1,9 +1,13 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content'
 import Layout from '../../layouts/Layout.astro'
+import Card from '../../components/common/Card.astro'
+import { getRoutesForEcosystem, getEcosistemaIds } from '../../utils/collections'
 
 export async function getStaticPaths() {
+  const ecoIds = await getEcosistemaIds()
   const ecosistemas = await getCollection('ecosistemas')
+  
   return ecosistemas.map(eco => ({
     params: { id: eco.id },
     props: { eco }
@@ -12,12 +16,10 @@ export async function getStaticPaths() {
 
 const { eco } = Astro.props
 const { Content } = await render(eco)
-
-const todasRutas = await getCollection('rutas', ({ data }) => data.publicada)
-const rutasEco = todasRutas.filter(r => r.data.ecosistema.id === eco.id)
+const rutasEco = await getRoutesForEcosystem(eco.id)
 ---
 
-<Layout titulo={eco.data.nome}>
+<Layout titulo={eco.data.nome} activeTab="ecosistemas">
 
   <!-- Cabecera -->
   <div class="bg-stone-900 px-4 pt-6 pb-5">
@@ -45,18 +47,15 @@ const rutasEco = todasRutas.filter(r => r.data.ecosistema.id === eco.id)
       </h2>
       <div class="flex flex-col gap-2">
         {rutasEco.map(ruta => (
-          <a href={`/ruta/${ruta.id}`}
-             class="bg-stone-900 border border-stone-800 rounded-xl p-3 flex justify-between items-center hover:border-green-800 transition-colors">
-            <div>
-              <div class="text-stone-200 text-sm font-medium">{ruta.data.titulo}</div>
-              <div class="text-stone-400 text-xs mt-0.5">
-                {ruta.data.distancia} km · {ruta.data.duracion}
-              </div>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-stone-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
+          <Card
+            href={`/ruta/${ruta.id}`}
+            title={ruta.data.titulo}
+            subtitle={ruta.data.provincia}
+            metadata={[
+              { label: 'Distancia', value: `${ruta.data.distancia} km` },
+              { label: 'Duración', value: ruta.data.duracion }
+            ]}
+          />
         ))}
       </div>
     </div>

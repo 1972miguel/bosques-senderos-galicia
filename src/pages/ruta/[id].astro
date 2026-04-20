@@ -1,9 +1,14 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content'
 import Layout from '../../layouts/Layout.astro'
+import Badge from '../../components/common/Badge.astro'
+import MapViewer from '../../components/map/MapViewer.astro'
+import { getRouteIds } from '../../utils/collections'
 
 export async function getStaticPaths() {
+  const routeIds = await getRouteIds()
   const rutas = await getCollection('rutas')
+  
   return rutas.map(ruta => ({
     params: { id: ruta.id },
     props: { ruta }
@@ -13,9 +18,18 @@ export async function getStaticPaths() {
 const { ruta } = Astro.props
 const ecosistema = await getEntry(ruta.data.ecosistema)
 const { Content } = await render(ruta)
+
+const difficultyColor = (difficulty: string) => {
+  const map: Record<string, any> = {
+    fácil: 'green',
+    moderada: 'yellow',
+    difícil: 'red'
+  }
+  return map[difficulty] || 'stone'
+}
 ---
 
-<Layout titulo={ruta.data.titulo}>
+<Layout titulo={ruta.data.titulo} activeTab="rutas">
 
   <div class="bg-stone-900 px-4 pt-6 pb-4">
     <a href="/rutas" class="text-green-500 text-sm mb-3 flex items-center gap-1">
@@ -29,24 +43,20 @@ const { Content } = await render(ruta)
       <p class="text-stone-400 text-sm mt-1">{ruta.data.subtitulo}</p>
     )}
     <div class="flex gap-2 mt-3 flex-wrap">
-      <span class="bg-stone-800 text-stone-300 text-xs px-3 py-1 rounded-full">
-        {ruta.data.tipo}
-      </span>
-      <span class="bg-stone-800 text-stone-300 text-xs px-3 py-1 rounded-full">
-        {ruta.data.dificultade}
-      </span>
-      <span class="bg-stone-800 text-stone-300 text-xs px-3 py-1 rounded-full">
-        {ruta.data.provincia}
-      </span>
+      <Badge label={ruta.data.tipo} color="stone" />
+      <Badge label={ruta.data.dificultade} color={difficultyColor(ruta.data.dificultade)} />
+      <Badge label={ruta.data.provincia} color="stone" />
     </div>
   </div>
 
-  <div
-    id="mapa"
-    class="w-full h-96 bg-stone-800 relative z-0"
-    data-lat={ruta.data.coordenadasInicio.lat}
-    data-lng={ruta.data.coordenadasInicio.lng}
-  ></div>
+  <!-- ✅ COMPONENTE MAPVIEWER (Reutilizable, testeable) -->
+  <MapViewer
+    routeId={ruta.id}
+    lat={ruta.data.coordenadasInicio.lat}
+    lng={ruta.data.coordenadasInicio.lng}
+    gpxFile={ruta.data.gpxFile}
+    height="h-96"
+  />
 
   <div class="grid grid-cols-3 gap-px bg-stone-800 border-y border-stone-800">
     <div class="bg-stone-950 px-4 py-3 text-center">
@@ -88,83 +98,3 @@ const { Content } = await render(ruta)
 
 </Layout>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script define:vars={{ gpxFile: ruta.data.gpxFile, lat: ruta.data.coordenadasInicio.lat, lng: ruta.data.coordenadasInicio.lng }}>
-
-document.addEventListener('DOMContentLoaded', async () => {
-  const L = window.L
-
-  const mapa = L.map('mapa', {
-    zoomControl: false,
-    attributionControl: true
-  }).setView([lat, lng], 14)
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-  }).addTo(mapa)
-
-  L.control.zoom({ position: 'bottomright' }).addTo(mapa)
-
-  if (!gpxFile) return
-
-  try {
-    const res = await fetch(`/data/rutas/${gpxFile}`)
-    const data = await res.json()
-
-    if (data.track && data.track.length > 0) {
-      const trackCoords = data.track.map(p => [p[0], p[1]])
-      L.polyline(trackCoords, {
-        color: '#4caf50',
-        weight: 3,
-        opacity: 0.9
-      }).addTo(mapa)
-      mapa.fitBounds(L.polyline(trackCoords).getBounds(), { padding: [20, 20] })
-    }
-
-    if (data.waypoints) {
-      data.waypoints.forEach(w => {
-        const icono = L.divIcon({
-          className: '',
-          html: `<div style="width:24px;height:24px;background:#1a2e1a;border:2px solid #4caf50;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#4caf50;font-family:system-ui,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.4)">${w.num}</div>`,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12]
-        })
-        L.marker([w.lat, w.lng], { icon: icono })
-          .addTo(mapa)
-          .bindPopup(`
-            <div style="font-family:system-ui,sans-serif;min-width:180px">
-              <div style="font-weight:600;font-size:13px;margin-bottom:4px;color:#1a2e1a">
-                ${w.num}. ${w.nome}
-              </div>
-              <div style="font-size:11px;color:#555;margin-bottom:4px">${w.km} km</div>
-              <div style="font-size:12px;color:#333;line-height:1.4">${w.nota}</div>
-            </div>
-          `, { maxWidth: 220 })
-      })
-    }
-
-  } catch(e) {
-    console.error('Error cargando datos de ruta:', e)
-  }
-
-  const iconoGeo = L.divIcon({
-    className: '',
-    html: `<div style="width:14px;height:14px;background:#2196f3;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(33,150,243,0.3)"></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7]
-  })
-
-  let marcadorGeo = null
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(pos => {
-      const { latitude, longitude } = pos.coords
-      if (marcadorGeo) {
-        marcadorGeo.setLatLng([latitude, longitude])
-      } else {
-        marcadorGeo = L.marker([latitude, longitude], { icon: iconoGeo }).addTo(mapa)
-      }
-    }, null, { enableHighAccuracy: true, maximumAge: 5000 })
-  }
-})
-</script>

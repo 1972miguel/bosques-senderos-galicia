@@ -1,9 +1,18 @@
 ---
-import { getCollection } from 'astro:content'
 import Layout from '../../layouts/Layout.astro'
+import Card from '../../components/common/Card.astro'
+import { getPublishedRoutes } from '../../utils/collections'
 
-const rutas = await getCollection('rutas', ({ data }) => data.publicada)
-console.log(rutas.map(r => r.id))
+const rutas = await getPublishedRoutes()
+
+const difficultyColor = (difficulty: string) => {
+  const colorMap: Record<string, any> = {
+    fácil: 'green',
+    moderada: 'yellow',
+    difícil: 'red'
+  }
+  return colorMap[difficulty] || 'stone'
+}
 ---
 
 <Layout titulo="Rutas" activeTab="rutas">
@@ -13,21 +22,19 @@ console.log(rutas.map(r => r.id))
 
     <div class="flex flex-col gap-3">
       {rutas.map(ruta => (
-        <a href={`/ruta/${ruta.id}`}
-           class="bg-stone-900 border border-stone-800 rounded-xl p-4 hover:border-green-800 transition-colors">
-          <div class="flex justify-between items-start mb-2">
-            <h2 class="text-stone-100 font-medium">{ruta.data.titulo}</h2>
-            <span class="text-xs text-stone-400 bg-stone-800 px-2 py-0.5 rounded-full shrink-0 ml-2">
-              {ruta.data.dificultade}
-            </span>
-          </div>
-          <p class="text-stone-400 text-xs mb-3">{ruta.data.provincia}</p>
-          <div class="flex gap-4">
-            <span class="text-xs text-stone-400">{ruta.data.distancia} km</span>
-            <span class="text-xs text-stone-400">↑ {ruta.data.desnivel} m</span>
-            <span class="text-xs text-stone-400">{ruta.data.duracion}</span>
-          </div>
-        </a>
+        <Card
+          href={`/ruta/${ruta.id}`}
+          title={ruta.data.titulo}
+          subtitle={ruta.data.provincia}
+          badges={[
+            { label: ruta.data.dificultade, color: difficultyColor(ruta.data.dificultade) }
+          ]}
+          metadata={[
+            { label: 'Distancia', value: `${ruta.data.distancia} km` },
+            { label: 'Desnivel', value: `↑ ${ruta.data.desnivel} m` },
+            { label: 'Duración', value: ruta.data.duracion }
+          ]}
+        />
       ))}
     </div>
   </div>

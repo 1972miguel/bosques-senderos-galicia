@@ -1,9 +1,9 @@
 ---
-import { getCollection } from 'astro:content'
 import Layout from '../../layouts/Layout.astro'
+import Card from '../../components/common/Card.astro'
+import { getAllEcosistemas } from '../../utils/collections'
 
-const ecosistemas = await getCollection('ecosistemas')
-console.log('IDs:', ecosistemas.map(e => e.id))
+const ecosistemas = await getAllEcosistemas()
 ---
 
 <Layout titulo="Ecosistemas" activeTab="ecosistemas">
@@ -13,13 +13,12 @@ console.log('IDs:', ecosistemas.map(e => e.id))
 
     <div class="flex flex-col gap-3">
       {ecosistemas.map(eco => (
-        <a href={`/ecosistemas/${eco.id}`}
-           class="bg-stone-900 border border-stone-800 rounded-xl p-4 hover:border-green-800 transition-colors"
-           >
-          <h2 class="text-stone-100 font-medium mb-1">{eco.data.nome}</h2>
-          <p class="text-stone-300 text-xs mb-2">{eco.data.zona}</p>
-          <p class="text-stone-400 text-sm leading-relaxed">{eco.data.resumo}</p>
-        </a>
+        <Card
+          href={`/ecosistemas/${eco.id}`}
+          title={eco.data.nome}
+          subtitle={eco.data.zona}
+          description={eco.data.resumo}
+        />
       ))}
     </div>
   </div>

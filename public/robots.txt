@@ -1,0 +1,15 @@
+# Robots.txt for Senderos e Bosques de Galicia
+# Allow all crawlers and point to sitemap
+
+User-agent: *
+Allow: /
+Disallow: 
+
+# Specify sitemap location
+Sitemap: https://senderosegalizia.gal/sitemap-index.xml
+
+# Crawl delay for heavy crawlers
+Crawl-delay: 10
+
+# Request rate (optional, for very aggressive crawlers)
+Request-rate: 1/10

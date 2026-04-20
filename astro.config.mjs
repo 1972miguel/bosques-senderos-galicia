@@ -3,9 +3,27 @@ import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
-  integrations: [mdx()],
+  site: "https://senderosegalizia.gal",
+  integrations: [
+    mdx(),
+    sitemap({
+      filter: (page) => !page.includes("404"),
+      changefreq: "weekly",
+      priority: 0.7,
+      entryLimit: 45000,
+      serialize(item) {
+        // Custom priority based on page type
+        if (item.url.includes("/rutas/")) item.priority = 0.8;
+        if (item.url.includes("/especies/")) item.priority = 0.75;
+        if (item.url.includes("/ecosistemas/")) item.priority = 0.75;
+        if (item.url === "https://senderosegalizia.gal/") item.priority = 1.0;
+        return item;
+      },
+    }),
+  ],
   vite: {
     plugins: [
       tailwindcss(),

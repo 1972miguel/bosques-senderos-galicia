@@ -1,0 +1,136 @@
+---
+/**
+ * Componente Mapa interactivo con Leaflet
+ * @file src/components/map/MapViewer.astro
+ * 
+ * Renderiza mapa de ruta con track y waypoints
+ * Reemplaza script inline en ruta/[id].astro
+ * 
+ * Uso:
+ * <MapViewer 
+ *   routeId="fragas-do-eume"
+ *   lat={43.3897}
+ *   lng={-7.9892}
+ *   gpxFile="fragas-do-eume.json"
+ * />
+ */
+
+import { initializeMap, addTrackToMap } from '../../utils/map'
+import type { RouteMapConfig } from '../../types'
+
+interface Props extends RouteMapConfig {
+  height?: string
+}
+
+const {
+  routeId,
+  lat,
+  lng,
+  zoom = 14,
+  gpxFile,
+  height = 'h-96'
+}: Props = Astro.props
+
+const mapId = `map-${routeId}`
+---
+
+<div id={mapId} class={`w-full ${height} bg-stone-800 relative z-0`}></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script client:load define:vars={{ mapId, lat, lng, zoom, gpxFile }}>
+  let retryCount = 0
+  const maxRetries = 50
+
+  async function initMap() {
+    // Esperar a que Leaflet esté disponible
+    if (!window.L) {
+      retryCount++
+      if (retryCount > maxRetries) {
+        console.error('Leaflet failed to load after', maxRetries, 'retries')
+        return
+      }
+      // Reintentar en 100ms
+      setTimeout(initMap, 100)
+      return
+    }
+
+    try {
+      const L = window.L
+      const map = L.map(mapId, {
+        zoomControl: false,
+        attributionControl: true
+      }).setView([lat, lng], zoom)
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(map)
+
+      L.control.zoom({ position: 'bottomright' }).addTo(map)
+
+      if (!gpxFile) return
+
+      const res = await fetch(`/data/rutas/${gpxFile}`)
+      const data = await res.json()
+
+      if (data.track && data.track.length > 0) {
+        const trackCoords = data.track.map(p => [p[0], p[1]])
+        L.polyline(trackCoords, {
+          color: '#4caf50',
+          weight: 3,
+          opacity: 0.9
+        }).addTo(map)
+        map.fitBounds(L.polyline(trackCoords).getBounds(), { padding: [20, 20] })
+      }
+
+      if (data.waypoints) {
+        data.waypoints.forEach(w => {
+          const icono = L.divIcon({
+            className: '',
+            html: `<div style="width:24px;height:24px;background:#1a2e1a;border:2px solid #4caf50;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#4caf50;font-family:system-ui,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.4)">${w.num}</div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          })
+          L.marker([w.lat, w.lng], { icon: icono })
+            .addTo(map)
+            .bindPopup(`
+              <div style="font-family:system-ui,sans-serif;min-width:180px">
+                <div style="font-weight:600;font-size:13px;margin-bottom:4px;color:#1a2e1a">
+                  ${w.num}. ${w.nome}
+                </div>
+                <div style="font-size:11px;color:#555;margin-bottom:4px">${w.km} km</div>
+                <div style="font-size:12px;color:#333;line-height:1.4">${w.nota}</div>
+              </div>
+            `, { maxWidth: 220 })
+        })
+      }
+
+      // Geolocation tracking
+      const iconoGeo = L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;background:#2196f3;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(33,150,243,0.3)"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      })
+
+      let marcadorGeo = null
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(pos => {
+          const { latitude, longitude } = pos.coords
+          if (marcadorGeo) {
+            marcadorGeo.setLatLng([latitude, longitude])
+          } else {
+            marcadorGeo = L.marker([latitude, longitude], { icon: iconoGeo }).addTo(map)
+          }
+        }, null, { enableHighAccuracy: true, maximumAge: 5000 })
+      }
+
+    } catch (err) {
+      console.error('Error initializing map:', err)
+    }
+  }
+
+  // Iniciar con reintentos
+  initMap()
+</script>

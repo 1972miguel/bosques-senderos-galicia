@@ -1,0 +1,81 @@
+---
+/**
+ * Componente Card reutilizable
+ * @file src/components/common/Card.astro
+ * 
+ * Tarjeta genérica para mostrar items en listados
+ * Reemplaza código duplicado en múltiples páginas
+ * 
+ * Uso:
+ * <Card 
+ *   href="/ruta/id"
+ *   title="Fragas do Eume"
+ *   subtitle="A Coruña"
+ *   badges={[{ label: 'moderada', color: 'stone' }]}
+ *   metadata={[{ label: 'Distancia', value: '11.4 km' }]}
+ * />
+ */
+
+import Badge from './Badge.astro'
+import type { BadgeColor } from '../../types'
+
+interface Props {
+  href: string
+  title: string
+  subtitle?: string
+  description?: string
+  metadata?: Array<{ label: string; value: string }>
+  badges?: Array<{ label: string; color?: BadgeColor }>
+  hoverEffect?: boolean
+}
+
+const {
+  href,
+  title,
+  subtitle,
+  description,
+  metadata = [],
+  badges = [],
+  hoverEffect = true
+} = Astro.props
+---
+
+<a
+  href={href}
+  class={`
+    bg-stone-900 border border-stone-800 rounded-xl p-4
+    ${hoverEffect ? 'hover:border-green-800 transition-colors' : ''}
+    flex flex-col gap-2
+  `}
+>
+  <!-- Encabezado: Título + Badges alineados a derecha -->
+  <div class="flex justify-between items-start gap-2">
+    <div class="flex-1">
+      <h2 class="text-stone-100 font-medium">{title}</h2>
+      {subtitle && <p class="text-stone-400 text-xs mt-1">{subtitle}</p>}
+    </div>
+    {badges.length > 0 && (
+      <div class="flex gap-1 flex-wrap justify-end shrink-0">
+        {badges.map(badge => (
+          <Badge label={badge.label} color={badge.color} />
+        ))}
+      </div>
+    )}
+  </div>
+
+  <!-- Descripción opcional -->
+  {description && (
+    <p class="text-stone-400 text-sm leading-relaxed">{description}</p>
+  )}
+
+  <!-- Metadata (distancia, duración, etc) -->
+  {metadata.length > 0 && (
+    <div class="flex gap-4 flex-wrap pt-1">
+      {metadata.map(item => (
+        <div class="text-xs text-stone-400">
+          <span class="font-medium text-stone-300">{item.label}:</span> {item.value}
+        </div>
+      ))}
+    </div>
+  )}
+</a>
